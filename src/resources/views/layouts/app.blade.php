@@ -10,11 +10,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-gray-50">
-        <div class="flex min-h-screen">
+        <div id="mobile-sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-gray-900/40 md:hidden"></div>
+        <div class="min-h-screen md:flex">
             <!-- Sidebar -->
-            <aside class="w-64 bg-white border-r border-gray-200">
+            <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 max-w-[85vw] -translate-x-full overflow-y-auto border-r border-gray-200 bg-white transition-transform duration-200 ease-out md:static md:z-auto md:w-64 md:max-w-none md:translate-x-0">
                 <!-- Logo -->
-                <div class="px-6 py-6 border-b border-gray-200">
+                <div class="flex items-start justify-between border-b border-gray-200 px-6 py-6">
+                    <div>
                     @php
                         $hasPngLogo = is_file(public_path('images/company-logo.png'));
                         $logoVersion = $hasPngLogo ? filemtime(public_path('images/company-logo.png')) : time();
@@ -26,6 +28,12 @@
                     @endif
                     <h1 class="text-2xl font-bold text-blue-600">SD Alumínios</h1>
                     <p class="text-sm text-gray-600 mt-1">Sistema de Gestão</p>
+                    </div>
+                    <button id="mobile-sidebar-close" type="button" class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 md:hidden" aria-label="Fechar menu lateral">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Nav Menu -->
@@ -34,7 +42,7 @@
                     $navItemClass = static fn (bool $active): string =>
                         'flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 transition '.($active ? 'bg-blue-50 text-blue-600' : 'text-gray-700');
                 @endphp
-                <nav class="px-3 py-6 space-y-2">
+                <nav class="space-y-2 px-3 py-6">
                     <a href="{{ route('dashboard.index') }}" class="{{ $navItemClass(request()->routeIs('dashboard.index')) }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11v-5m0 0V9m0 5a1 1 0 11-2 0m0 0a1 1 0 012 0"></path>
@@ -197,13 +205,20 @@
             </aside>
 
             <!-- Main Content -->
-            <div class="flex-1 flex flex-col">
+            <div class="flex min-w-0 flex-1 flex-col">
                 <!-- Top Bar -->
                 <header class="bg-white border-b border-gray-200">
-                    <div class="px-6 py-4 flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-gray-900">@yield('page-title', 'Página')</h2>
+                    <div class="flex items-center justify-between gap-3 px-4 py-4 md:px-6">
+                        <div class="flex min-w-0 items-center gap-3">
+                            <button id="mobile-sidebar-open" type="button" class="rounded-md border border-gray-200 p-2 text-gray-600 hover:bg-gray-100 md:hidden" aria-label="Abrir menu lateral">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </button>
+                            <h2 class="truncate text-base font-semibold text-gray-900 md:text-lg">@yield('page-title', 'Página')</h2>
+                        </div>
                         
-                        <div class="flex items-center space-x-6">
+                        <div class="flex items-center space-x-3 md:space-x-6">
                             @php
                                 $pendingNotifications = 0;
                                 if (\Illuminate\Support\Facades\Schema::hasTable('quotes')) {
@@ -222,13 +237,13 @@
                                 @endif
                             </a>
 
-                            <div class="relative group">
-                                <button class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition">
+                            <details class="relative">
+                                <summary class="flex cursor-pointer list-none items-center space-x-2 rounded-lg px-2 py-2 hover:bg-gray-100 transition md:px-4">
                                     <div class="w-8 h-8 bg-linear-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
-                                    <span class="text-gray-700">{{ Auth::user()->name }}</span>
-                                </button>
+                                    <span class="hidden text-gray-700 sm:inline">{{ Auth::user()->name }}</span>
+                                </summary>
                                 
-                                <div class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                                <div class="absolute right-0 z-50 mt-2 w-48 rounded-lg bg-white py-2 shadow-lg">
                                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Perfil</a>
                                     @if((string) (Auth::user()->profile ?? '') === 'admin')
                                         <a href="{{ route('settings.commercial.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Configurações</a>
@@ -241,17 +256,73 @@
                                         <button type="submit" class="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-100">Sair</button>
                                     </form>
                                 </div>
-                            </div>
+                            </details>
                         </div>
                     </div>
                 </header>
 
                 <!-- Page Content -->
-                <main class="flex-1 p-6">
-                    @yield('content')
+                <main class="flex-1 overflow-x-auto p-4 md:p-6">
+                    <div class="min-w-0">
+                        @yield('content')
+                    </div>
                 </main>
             </div>
         </div>
+
+        <script>
+            (() => {
+                const body = document.body;
+                const sidebar = document.getElementById('app-sidebar');
+                const openBtn = document.getElementById('mobile-sidebar-open');
+                const closeBtn = document.getElementById('mobile-sidebar-close');
+                const backdrop = document.getElementById('mobile-sidebar-backdrop');
+
+                if (!sidebar || !openBtn || !closeBtn || !backdrop) {
+                    return;
+                }
+
+                const closeSidebar = () => {
+                    sidebar.classList.add('-translate-x-full');
+                    backdrop.classList.add('hidden');
+                    body.classList.remove('overflow-hidden');
+                };
+
+                const openSidebar = () => {
+                    sidebar.classList.remove('-translate-x-full');
+                    backdrop.classList.remove('hidden');
+                    body.classList.add('overflow-hidden');
+                };
+
+                openBtn.addEventListener('click', openSidebar);
+                closeBtn.addEventListener('click', closeSidebar);
+                backdrop.addEventListener('click', closeSidebar);
+
+                sidebar.querySelectorAll('a').forEach((anchor) => {
+                    anchor.addEventListener('click', () => {
+                        if (window.innerWidth < 768) {
+                            closeSidebar();
+                        }
+                    });
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth >= 768) {
+                        backdrop.classList.add('hidden');
+                        body.classList.remove('overflow-hidden');
+                        sidebar.classList.remove('-translate-x-full');
+                    } else {
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        closeSidebar();
+                    }
+                });
+            })();
+        </script>
 
         @stack('modals')
         @yield('scripts')
