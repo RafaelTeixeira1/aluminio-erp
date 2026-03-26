@@ -1,0 +1,166 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Aluminio ERP API",
+    "version": "1.0.0",
+    "description": "API do sistema de gestao comercial, estoque, financeiro e operacoes."
+  },
+  "servers": [
+    {
+      "url": "http://localhost/api",
+      "description": "Ambiente local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Token"
+      }
+    }
+  },
+  "paths": {
+    "/api/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Realiza login e retorna token"
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Retorna usuario autenticado",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/dashboard/resumo": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Resumo de indicadores",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/clientes": {
+      "get": {
+        "tags": ["Clientes"],
+        "summary": "Lista clientes",
+        "security": [{ "BearerToken": [] }]
+      },
+      "post": {
+        "tags": ["Clientes"],
+        "summary": "Cria cliente",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/clientes/{cliente}": {
+      "get": {
+        "tags": ["Clientes"],
+        "summary": "Detalha cliente",
+        "security": [{ "BearerToken": [] }]
+      },
+      "put": {
+        "tags": ["Clientes"],
+        "summary": "Atualiza cliente",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/produtos": {
+      "get": {
+        "tags": ["Produtos"],
+        "summary": "Lista produtos",
+        "security": [{ "BearerToken": [] }]
+      },
+      "post": {
+        "tags": ["Produtos"],
+        "summary": "Cria produto",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/orcamentos": {
+      "get": {
+        "tags": ["Orcamentos"],
+        "summary": "Lista orcamentos",
+        "security": [{ "BearerToken": [] }]
+      },
+      "post": {
+        "tags": ["Orcamentos"],
+        "summary": "Cria orcamento",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/vendas": {
+      "get": {
+        "tags": ["Vendas"],
+        "summary": "Lista vendas",
+        "security": [{ "BearerToken": [] }]
+      },
+      "post": {
+        "tags": ["Vendas"],
+        "summary": "Cria venda",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/contas-a-pagar": {
+      "get": {
+        "tags": ["Financeiro"],
+        "summary": "Lista contas a pagar",
+        "security": [{ "BearerToken": [] }]
+      },
+      "post": {
+        "tags": ["Financeiro"],
+        "summary": "Cria conta a pagar",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/contas-a-receber": {
+      "get": {
+        "tags": ["Financeiro"],
+        "summary": "Lista contas a receber",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/fluxo-caixa": {
+      "get": {
+        "tags": ["Financeiro"],
+        "summary": "Lista fluxo de caixa",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/operacao/health": {
+      "get": {
+        "tags": ["Operacao"],
+        "summary": "Health check",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/operacao/readiness": {
+      "get": {
+        "tags": ["Operacao"],
+        "summary": "Readiness check",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/operacao/preflight": {
+      "get": {
+        "tags": ["Operacao"],
+        "summary": "Checklist preflight",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/operacao/backup": {
+      "post": {
+        "tags": ["Operacao"],
+        "summary": "Cria backup operacional",
+        "security": [{ "BearerToken": [] }]
+      }
+    },
+    "/api/operacao/backup/verificar": {
+      "post": {
+        "tags": ["Operacao"],
+        "summary": "Verifica integridade de backup",
+        "security": [{ "BearerToken": [] }]
+      }
+    }
+  }
+}

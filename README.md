@@ -79,6 +79,11 @@ php artisan serve
 ./scripts/dapp php artisan test
 ```
 
+Pipeline de CI:
+
+- GitHub Actions em `.github/workflows/ci.yml`
+- Executa validacao de contrato OpenAPI e suite completa em push/PR para `main`
+
 Status atual da suíte:
 
 - 129 testes passando
@@ -105,6 +110,12 @@ Sugestão para portfólio: incluir imagens reais das telas em `docs/screenshots/
 
 - Tag publicada: `v1.0.0`
 - Notas prontas: `RELEASE_NOTES_v1.0.0.md`
+
+## Hardening e operacao
+
+- Exemplo de variaveis para producao: `src/.env.production.example`
+- Checklist de deploy/hardening: `src/docs/deploy/production-checklist.md`
+- Contrato OpenAPI: `src/docs/openapi/openapi.json`
 
 ## Estrutura do repositório
 
