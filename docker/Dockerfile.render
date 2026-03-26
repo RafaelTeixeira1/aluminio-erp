@@ -1,0 +1,58 @@
+FROM node:20-alpine AS assets
+
+WORKDIR /app
+
+COPY src/package.json src/package-lock.json ./
+RUN npm ci
+
+COPY src/ ./
+RUN npm run build
+
+
+FROM php:8.3-apache
+
+# Dependencias do sistema e extensoes PHP necessarias para Laravel.
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    curl \
+    libzip-dev \
+    libpng-dev \
+    libonig-dev \
+    libicu-dev \
+    libxml2-dev \
+    default-mysql-client \
+  && docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    mbstring \
+    zip \
+    intl \
+    bcmath \
+    exif \
+  && a2enmod rewrite headers expires \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+  && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+WORKDIR /var/www/html
+
+COPY src/ ./
+
+RUN composer install --no-dev --optimize-autoloader --no-interaction \
+  && php artisan package:discover --ansi
+
+COPY --from=assets /app/public/build ./public/build
+
+# Permissoes de escrita para caches e storage em runtime.
+RUN chown -R www-data:www-data storage bootstrap/cache \
+  && chmod -R ug+rw storage bootstrap/cache
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]
