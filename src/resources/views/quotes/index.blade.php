@@ -4,19 +4,19 @@
 @section('page-title', 'Gerenciar Orcamentos')
 
 @section('content')
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Orcamentos</h1>
-        <p class="text-gray-600 mt-1">Acompanhe status e converta em vendas</p>
+        <p class="mt-1 text-gray-600">Acompanhe status e converta em vendas</p>
     </div>
-    <div class="flex items-center gap-2">
-        <a href="{{ route('quotes.exportCsv', request()->query()) }}" class="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-lg hover:bg-emerald-200 transition">
+    <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <a href="{{ route('quotes.exportCsv', request()->query()) }}" class="rounded-lg bg-emerald-100 px-4 py-2 text-center text-emerald-800 transition hover:bg-emerald-200">
             Exportar CSV
         </a>
-        <a href="{{ route('quotes.exportPdf', request()->query()) }}" target="_blank" class="bg-slate-100 text-slate-800 px-4 py-2 rounded-lg hover:bg-slate-200 transition">
+        <a href="{{ route('quotes.exportPdf', request()->query()) }}" target="_blank" class="rounded-lg bg-slate-100 px-4 py-2 text-center text-slate-800 transition hover:bg-slate-200">
             Exportar PDF
         </a>
-        <a href="{{ route('quotes.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <a href="{{ route('quotes.create') }}" class="rounded-lg bg-blue-600 px-4 py-2 text-center text-white transition hover:bg-blue-700">
             + Novo Orcamento
         </a>
     </div>
@@ -74,14 +74,14 @@
                 <option value="asc" {{ ($filters['sort_dir'] ?? '') === 'asc' ? 'selected' : '' }}>Crescente</option>
             </select>
         </div>
-        <div class="flex items-end gap-2">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Filtrar</button>
-            <a href="{{ route('quotes.index') }}" class="bg-gray-200 text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Limpar</a>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">Filtrar</button>
+            <a href="{{ route('quotes.index') }}" class="rounded-lg bg-gray-200 px-4 py-2 text-center text-gray-900 transition hover:bg-gray-300">Limpar</a>
         </div>
     </div>
 </form>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white rounded-lg shadow overflow-x-auto">
     <table class="w-full">
         <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -113,7 +113,7 @@
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-700">{{ $quote->valid_until ? $quote->valid_until->format('d/m/Y') : '-' }}</td>
                     <td class="px-6 py-4 text-sm font-semibold text-right text-gray-900">R$ {{ number_format((float) $quote->total, 2, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-sm text-right space-x-2">
+                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
                         <a href="{{ route('quotes.edit', $quote) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         <a href="{{ route('quotes.printPreview', $quote) }}" target="_blank" class="text-slate-600 hover:text-slate-900">Impressao</a>
                         <button onclick="openEmailModal({{ $quote->id }}, '{{ $quote->client?->email ?? '' }}')" class="text-amber-600 hover:text-amber-900">Email</button>

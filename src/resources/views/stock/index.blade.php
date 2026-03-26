@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50 border-b border-gray-200">
                     <tr>
@@ -147,7 +147,7 @@
             <div>{{ $items->links() }}</div>
         @endif
 
-        <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
             <div class="px-6 py-4 border-b border-gray-200">
                 <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Ultimas Movimentacoes</h3>
             </div>

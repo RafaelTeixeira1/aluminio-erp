@@ -42,7 +42,7 @@
                 <label class="block text-xs font-medium text-gray-600 mb-1">Buscar</label>
                 <input type="text" name="search" value="{{ $search }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Titulo, observacao ou numero do orcamento">
             </div>
-            <div class="flex items-end gap-2">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Filtrar</button>
                 <a href="{{ route('designSketches.index', ($quoteId ?? null) !== null ? ['quote_id' => $quoteId] : []) }}" class="bg-gray-200 text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Limpar</a>
             </div>

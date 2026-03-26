@@ -100,7 +100,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
         <div class="px-4 py-3 border-b border-gray-200">
             <h3 class="text-base font-semibold text-gray-900">Lancamentos considerados no DRE</h3>
         </div>

@@ -4,7 +4,7 @@
 @section('page-title', 'Gerenciar Pedidos de Compra')
 
 @section('content')
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Pedidos de Compra</h1>
         <p class="text-gray-600 mt-1">Gerencie seus pedidos de compra e recebimentos</p>
@@ -62,7 +62,7 @@
 </div>
 
 <!-- Tabela de Pedidos -->
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white rounded-lg shadow overflow-x-auto">
     <table class="w-full">
         <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -116,7 +116,7 @@
                             </span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-sm text-right space-x-2">
+                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
                         <a href="{{ route('purchase-orders.show', $purchase) }}" class="text-green-600 hover:text-green-900">Ver</a>
                         @if($purchase->status !== 'cancelado' && $purchase->status !== 'recebido')
                             <form action="{{ route('purchase-orders.cancel', $purchase) }}" method="POST" class="inline"

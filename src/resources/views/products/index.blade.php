@@ -47,7 +47,7 @@
                         <option value="inactive" {{ ($filters['status'] ?? '') === 'inactive' ? 'selected' : '' }}>Inativo</option>
                     </select>
                 </div>
-                <div class="flex items-end gap-2">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Filtrar</button>
                     <a href="{{ route('products.index') }}" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Limpar</a>
                 </div>

@@ -4,7 +4,7 @@
 @section('page-title', 'Gerenciar Fornecedores')
 
 @section('content')
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Fornecedores</h1>
         <p class="text-gray-600 mt-1">Gerencie seus fornecedores e histórico de compras</p>
@@ -43,7 +43,7 @@
 </div>
 
 <!-- Tabela de Fornecedores -->
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white rounded-lg shadow overflow-x-auto">
     <table class="w-full">
         <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -87,7 +87,7 @@
                             </span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-sm text-right space-x-2">
+                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
                         <a href="{{ route('suppliers.show', $supplier) }}" class="text-green-600 hover:text-green-900">Ver</a>
                         <a href="{{ route('suppliers.edit', $supplier) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         @if($supplier->is_active)

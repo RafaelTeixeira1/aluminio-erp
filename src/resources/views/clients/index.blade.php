@@ -4,12 +4,12 @@
 @section('page-title', 'Gerenciar Clientes')
 
 @section('content')
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Clientes</h1>
-        <p class="text-gray-600 mt-1">Cadastre e acompanhe o histórico comercial dos clientes</p>
+        <p class="mt-1 text-gray-600">Cadastre e acompanhe o histórico comercial dos clientes</p>
     </div>
-    <a href="{{ route('clients.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+    <a href="{{ route('clients.create') }}" class="w-full rounded-lg bg-blue-600 px-4 py-2 text-center text-white transition hover:bg-blue-700 sm:w-auto">
         + Novo Cliente
     </a>
 </div>
@@ -20,7 +20,7 @@
     </div>
 @endif
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-white rounded-lg shadow overflow-x-auto">
     <table class="w-full">
         <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -48,7 +48,7 @@
                     <td class="px-6 py-4 text-sm text-gray-700">{{ $client->document ?: '-' }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 text-right">{{ $client->sales_count }}</td>
                     <td class="px-6 py-4 text-sm font-semibold text-gray-900 text-right">R$ {{ number_format((float) ($client->total_spent ?? 0), 2, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-sm text-right space-x-2">
+                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
                         <a href="{{ route('clients.edit', $client) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         <form action="{{ route('clients.destroy', $client) }}" method="POST" class="inline" onsubmit="return confirm('Deseja realmente remover este cliente?');">
                             @csrf
