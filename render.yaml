@@ -1,0 +1,108 @@
+services:
+  - type: web
+    name: aluminio-erp-web
+    env: docker
+    plan: starter
+    dockerfilePath: ./docker/Dockerfile.render
+    dockerContext: .
+    autoDeploy: true
+    healthCheckPath: /api/operacao/health
+    envVars:
+      - fromGroup: aluminio-erp-prod-secrets
+      - key: APP_NAME
+        value: Aluminio ERP
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_STACK
+        value: daily
+      - key: LOG_LEVEL
+        value: warning
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_PORT
+        value: "3306"
+      - key: CACHE_STORE
+        value: database
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_SCHEME
+        value: tls
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_FROM_NAME
+        value: Aluminio ERP
+      - key: COMPANY_NAME
+        value: SD Aluminios
+
+  - type: worker
+    name: aluminio-erp-queue
+    env: docker
+    plan: starter
+    dockerfilePath: ./docker/Dockerfile.render
+    dockerContext: .
+    autoDeploy: true
+    startCommand: php artisan queue:work --sleep=3 --tries=3 --timeout=120
+    envVars:
+      - fromGroup: aluminio-erp-prod-secrets
+      - key: APP_NAME
+        value: Aluminio ERP
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_STACK
+        value: daily
+      - key: LOG_LEVEL
+        value: warning
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_PORT
+        value: "3306"
+      - key: CACHE_STORE
+        value: database
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+
+cronJobs:
+  - name: aluminio-erp-scheduler
+    env: docker
+    schedule: "* * * * *"
+    dockerfilePath: ./docker/Dockerfile.render
+    dockerContext: .
+    command: php artisan schedule:run
+    envVars:
+      - fromGroup: aluminio-erp-prod-secrets
+      - key: APP_NAME
+        value: Aluminio ERP
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_STACK
+        value: daily
+      - key: LOG_LEVEL
+        value: warning
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_PORT
+        value: "3306"
+      - key: CACHE_STORE
+        value: database
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
