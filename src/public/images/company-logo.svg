@@ -1,0 +1,8 @@
+<svg width="420" height="120" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="120" rx="16" fill="#0F172A"/>
+  <rect x="14" y="14" width="92" height="92" rx="12" fill="#1D4ED8"/>
+  <path d="M36 78V42H59C68.5 42 74 47.3 74 55C74 62.7 68.5 68 59 68H46V78H36ZM46 60H58C62.2 60 64.5 58.1 64.5 55C64.5 51.9 62.2 50 58 50H46V60Z" fill="#F8FAFC"/>
+  <path d="M31 95L46 26H56L41 95H31Z" fill="#93C5FD"/>
+  <text x="124" y="56" fill="#F8FAFC" font-size="34" font-family="Arial, Helvetica, sans-serif" font-weight="700">SD Aluminios</text>
+  <text x="124" y="84" fill="#93C5FD" font-size="16" font-family="Arial, Helvetica, sans-serif">Orcamentos sob medida</text>
+</svg>

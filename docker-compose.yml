@@ -1,0 +1,90 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    container_name: ${APP_CONTAINER_NAME:-vidracaria_app}
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      APACHE_DOCUMENT_ROOT: /var/www/html/public
+    command: >
+      sh -lc "if [ ! -L /var/www/html/public/storage ]; then
+      php artisan storage:link || true;
+      fi;
+      apache2-foreground"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - vidracaria
+
+  db:
+    image: mariadb:11
+    container_name: ${DB_CONTAINER_NAME:-vidracaria_db}
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE:-vidracaria}
+      MARIADB_USER: ${DB_USERNAME:-vidracaria}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-vidracaria123}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root123}
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -u$$MARIADB_USER -p$$MARIADB_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - vidracaria
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ${PMA_CONTAINER_NAME:-vidracaria_pma}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PMA_PORT:-8081}:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 0
+      UPLOAD_LIMIT: 128M
+    networks:
+      - vidracaria
+
+  node:
+    image: node:20
+    container_name: ${NODE_CONTAINER_NAME:-vidracaria_node}
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+      - node_modules:/var/www/html/node_modules
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    command: sh -c "mkdir -p node_modules && chown -R node:node node_modules && su node -s /bin/sh -c 'if [ ! -d node_modules ] || [ ! -f node_modules/.package-lock-ready ]; then npm install && touch node_modules/.package-lock-ready; fi && npm run dev -- --host 0.0.0.0'"
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - vidracaria
+
+volumes:
+  dbdata:
+  node_modules:
+
+networks:
+  vidracaria:
+    driver: bridge

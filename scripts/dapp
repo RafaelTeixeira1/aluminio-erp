@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run commands inside the app container as the host user, avoiding root-owned files.
+if [ "$#" -eq 0 ]; then
+  echo "Uso: scripts/dapp <comando> [args...]"
+  exit 1
+fi
+
+exec docker compose exec -u "$(id -u):$(id -g)" app "$@"
