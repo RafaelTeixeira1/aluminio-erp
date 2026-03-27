@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\DocumentSequence;
 use App\Services\SequenceService;
 use Illuminate\Http\JsonResponse;

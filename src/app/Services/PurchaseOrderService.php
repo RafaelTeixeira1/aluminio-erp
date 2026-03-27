@@ -40,7 +40,8 @@ class PurchaseOrderService
 
             $rows = [];
             foreach ($items as $item) {
-                $quantity = (float) $item['quantity_ordered'];
+                $quantityRaw = $item['quantity_ordered'] ?? $item['quantity'] ?? null;
+                $quantity = (float) $quantityRaw;
                 $unitCost = (float) ($item['unit_cost'] ?? 0);
 
                 if ($quantity <= 0) {

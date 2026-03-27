@@ -18,6 +18,7 @@ use App\Http\Controllers\Web\StockController;
 use App\Http\Controllers\Web\UserController;
 use App\Http\Controllers\Web\SupplierController;
 use App\Http\Controllers\Web\PurchaseOrderController;
+use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\SequenceController;
 
 Route::get('/', function () {
@@ -33,6 +34,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/perfil', [ManagementController::class, 'profile'])->name('profile.edit');
     Route::put('/perfil', [ManagementController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/notificacoes', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notificacoes/ler-todas', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::post('/notificacoes/{notification}/ler', [NotificationController::class, 'markAsRead'])->name('notifications.markRead');
 
     Route::middleware('profile:admin,vendedor,estoquista,operador')->group(function () {
         Route::get('/dashboard', [ManagementController::class, 'dashboard'])->name('dashboard.index');

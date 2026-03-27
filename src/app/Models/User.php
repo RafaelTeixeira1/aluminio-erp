@@ -80,4 +80,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(CashEntry::class);
     }
+
+    public function operationalNotifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class)->latest('created_at');
+    }
 }
