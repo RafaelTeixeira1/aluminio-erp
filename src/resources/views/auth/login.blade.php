@@ -50,7 +50,7 @@
                 </form>
 
                 <div class="mt-6 text-center text-xs text-gray-500">
-                    Dev Rafael Teixeira
+                    <a href="https://github.com/RafaelTeixeira1" target="_blank" rel="noopener noreferrer" class="hover:text-gray-700">Dev Rafael Teixeira (@RafaelTeixeira1)</a>
                 </div>
             </div>
         </div>

@@ -205,7 +205,7 @@
                     @endif
 
                     <div class="pt-6 mt-6 border-t border-gray-100 px-4">
-                        <p class="text-xs text-gray-400">Dev Rafael Teixeira</p>
+                        <a href="https://github.com/RafaelTeixeira1" target="_blank" rel="noopener noreferrer" class="text-xs text-gray-400 hover:text-gray-600">Dev Rafael Teixeira (@RafaelTeixeira1)</a>
                     </div>
                 </nav>
             </aside>
