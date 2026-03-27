@@ -26,8 +26,6 @@
                     @else
                         <img src="{{ asset('images/company-logo.svg') }}" alt="Logo da empresa" class="h-16 w-auto max-w-[180px] object-contain mb-2">
                     @endif
-                    <h1 class="text-2xl font-bold text-blue-600">SD Alumínios</h1>
-                    <p class="text-sm text-gray-600 mt-1">Sistema de Gestão</p>
                     </div>
                     <button id="mobile-sidebar-close" type="button" class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 md:hidden" aria-label="Fechar menu lateral">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,36 +71,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 14.5a2 2 0 01-.95.536L8 16l.964-3.586A2 2 0 019.5 11.5z"></path>
                             </svg>
                             Desenhos
-                        </a>
-                        @endif
-
-                        @if($profile === 'admin')
-                        <a href="/financeiro/receber" class="{{ $navItemClass(request()->is('financeiro/receber*')) }}">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a5 5 0 00-10 0v2m-2 0h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2zm7 4h.01"></path>
-                            </svg>
-                            Financeiro - Receber
-                        </a>
-
-                        <a href="/financeiro/pagar" class="{{ $navItemClass(request()->is('financeiro/pagar*')) }}">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                            </svg>
-                            Financeiro - Pagar
-                        </a>
-
-                        <a href="/financeiro/fluxo-caixa" class="{{ $navItemClass(request()->is('financeiro/fluxo-caixa*')) }}">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17l6-6 4 4 8-8"></path>
-                            </svg>
-                            Financeiro - Fluxo Caixa
-                        </a>
-
-                        <a href="/financeiro/dre" class="{{ $navItemClass(request()->is('financeiro/dre*')) }}">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0a2 2 0 002 2h2a2 2 0 002-2M9 17V9a2 2 0 012-2h2a2 2 0 012 2v8m0 0V5a2 2 0 012-2h2a2 2 0 012 2v12"></path>
-                            </svg>
-                            Financeiro - DRE
                         </a>
                         @endif
 
@@ -201,6 +169,44 @@
                         </a>
                     </div>
                     @endif
+
+                    @if($profile === 'admin')
+                    <div class="pt-4">
+                        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Financeiro</p>
+
+                        <a href="/financeiro/receber" class="{{ $navItemClass(request()->is('financeiro/receber*')) }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a5 5 0 00-10 0v2m-2 0h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2zm7 4h.01"></path>
+                            </svg>
+                            Receber
+                        </a>
+
+                        <a href="/financeiro/pagar" class="{{ $navItemClass(request()->is('financeiro/pagar*')) }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                            Pagar
+                        </a>
+
+                        <a href="/financeiro/fluxo-caixa" class="{{ $navItemClass(request()->is('financeiro/fluxo-caixa*')) }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17l6-6 4 4 8-8"></path>
+                            </svg>
+                            Fluxo de Caixa
+                        </a>
+
+                        <a href="/financeiro/dre" class="{{ $navItemClass(request()->is('financeiro/dre*')) }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0a2 2 0 002 2h2a2 2 0 002-2M9 17V9a2 2 0 012-2h2a2 2 0 012 2v8m0 0V5a2 2 0 012-2h2a2 2 0 012 2v12"></path>
+                            </svg>
+                            DRE
+                        </a>
+                    </div>
+                    @endif
+
+                    <div class="pt-6 mt-6 border-t border-gray-100 px-4">
+                        <p class="text-xs text-gray-400">Dev Rafael Teixeira</p>
+                    </div>
                 </nav>
             </aside>
 

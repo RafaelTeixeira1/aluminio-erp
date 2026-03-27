@@ -10,8 +10,15 @@
         <div class="w-full max-w-md">
             <div class="bg-white rounded-lg shadow-xl p-8">
                 <div class="text-center mb-8">
-                    <h1 class="text-3xl font-bold text-blue-600">SD Alumínios</h1>
-                    <p class="text-gray-600 mt-2">Sistema de Gestão</p>
+                    @php
+                        $hasPngLogo = is_file(public_path('images/company-logo.png'));
+                        $logoVersion = $hasPngLogo ? filemtime(public_path('images/company-logo.png')) : time();
+                    @endphp
+                    @if($hasPngLogo)
+                        <img src="{{ asset('images/company-logo.png') }}?v={{ $logoVersion }}" alt="Logo da empresa" class="mx-auto h-20 w-auto max-w-[220px] object-contain">
+                    @else
+                        <img src="{{ asset('images/company-logo.svg') }}" alt="Logo da empresa" class="mx-auto h-20 w-auto max-w-[220px] object-contain">
+                    @endif
                 </div>
 
                 @if ($errors->any())
@@ -42,12 +49,8 @@
                     </button>
                 </form>
 
-                <div class="mt-6 text-center text-sm text-gray-600">
-                    <p>Credenciais de demonstração:</p>
-                    <p class="font-mono text-xs mt-2">
-                        Email: <span class="text-gray-900">admin@sdaluminios.com.br</span><br>
-                        Senha: <span class="text-gray-900">12345678</span>
-                    </p>
+                <div class="mt-6 text-center text-xs text-gray-500">
+                    Dev Rafael Teixeira
                 </div>
             </div>
         </div>
