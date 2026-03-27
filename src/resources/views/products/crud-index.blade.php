@@ -63,7 +63,7 @@
                             {{ $product->is_active ? 'Ativo' : 'Inativo' }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
+                    <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('products.edit', $product) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         <form action="{{ route('products.destroy', $product) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza?');">
                             @csrf

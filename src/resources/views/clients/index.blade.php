@@ -48,7 +48,7 @@
                     <td class="px-6 py-4 text-sm text-gray-700">{{ $client->document ?: '-' }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 text-right">{{ $client->sales_count }}</td>
                     <td class="px-6 py-4 text-sm font-semibold text-gray-900 text-right">R$ {{ number_format((float) ($client->total_spent ?? 0), 2, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
+                    <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('clients.edit', $client) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         <form action="{{ route('clients.destroy', $client) }}" method="POST" class="inline" onsubmit="return confirm('Deseja realmente remover este cliente?');">
                             @csrf

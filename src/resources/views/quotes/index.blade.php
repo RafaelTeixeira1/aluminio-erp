@@ -113,7 +113,7 @@
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-700">{{ $quote->valid_until ? $quote->valid_until->format('d/m/Y') : '-' }}</td>
                     <td class="px-6 py-4 text-sm font-semibold text-right text-gray-900">R$ {{ number_format((float) $quote->total, 2, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
+                    <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('quotes.edit', $quote) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         <a href="{{ route('quotes.printPreview', $quote) }}" target="_blank" class="text-slate-600 hover:text-slate-900">Impressao</a>
                         <button onclick="openEmailModal({{ $quote->id }}, '{{ $quote->client?->email ?? '' }}')" class="text-amber-600 hover:text-amber-900">Email</button>

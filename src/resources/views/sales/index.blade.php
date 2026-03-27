@@ -94,7 +94,7 @@
                     </td>
                     <td class="px-6 py-4 text-sm text-right text-gray-700">{{ $sale->items->count() }}</td>
                     <td class="px-6 py-4 text-sm font-semibold text-right text-gray-900">R$ {{ number_format((float) $sale->total, 2, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
+                    <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('sales.printPreview', $sale) }}" target="_blank" class="text-slate-600 hover:text-slate-900">Impressao</a>
                         @if($sale->status !== 'confirmada')
                             <a href="{{ route('sales.edit', $sale) }}" class="text-blue-600 hover:text-blue-900">Editar Itens</a>

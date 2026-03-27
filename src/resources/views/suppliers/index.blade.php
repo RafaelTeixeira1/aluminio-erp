@@ -87,7 +87,7 @@
                             </span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
+                    <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('suppliers.show', $supplier) }}" class="text-green-600 hover:text-green-900">Ver</a>
                         <a href="{{ route('suppliers.edit', $supplier) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         @if($supplier->is_active)

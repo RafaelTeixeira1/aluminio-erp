@@ -116,7 +116,7 @@
                             </span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-sm text-right space-y-1 sm:space-y-0 sm:space-x-2">
+                    <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('purchase-orders.show', $purchase) }}" class="text-green-600 hover:text-green-900">Ver</a>
                         @if($purchase->status !== 'cancelado' && $purchase->status !== 'recebido')
                             <form action="{{ route('purchase-orders.cancel', $purchase) }}" method="POST" class="inline"
