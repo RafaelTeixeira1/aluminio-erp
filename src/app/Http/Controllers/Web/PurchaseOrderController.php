@@ -10,6 +10,7 @@ use App\Models\Supplier;
 use App\Services\PurchaseOrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class PurchaseOrderController extends Controller
@@ -75,7 +76,7 @@ class PurchaseOrderController extends Controller
         try {
             $this->purchaseOrderService->create(
                 $request->validated(),
-                auth()->id()
+                Auth::id()
             );
 
             return redirect()->route('purchase-orders.index')
@@ -107,7 +108,7 @@ class PurchaseOrderController extends Controller
                 $purchaseOrder,
                 $request->purchase_order_item_id,
                 $request->quantity_received,
-                auth()->id(),
+                Auth::id(),
                 $request->received_at ? \Carbon\Carbon::parse($request->received_at) : null,
                 $request->notes
             );

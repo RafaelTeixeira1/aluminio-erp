@@ -102,7 +102,7 @@ class WebCoreFlowsTest extends TestCase
         $this->assertStringStartsWith('storage/products/', (string) $product->image_path);
 
         $storedPath = str_replace('storage/', '', (string) $product->image_path);
-        Storage::disk('public')->assertExists($storedPath);
+        $this->assertTrue(Storage::disk('public')->exists($storedPath));
     }
 
     public function test_admin_can_register_product_gallery_images_with_kind_and_primary(): void
@@ -147,8 +147,8 @@ class WebCoreFlowsTest extends TestCase
         $this->assertSame('roldana', $images[0]->image_kind);
         $this->assertTrue((bool) $images[0]->is_primary);
 
-        Storage::disk('public')->assertExists(str_replace('storage/', '', (string) $images[0]->image_path));
-        Storage::disk('public')->assertExists(str_replace('storage/', '', (string) $images[1]->image_path));
+        $this->assertTrue(Storage::disk('public')->exists(str_replace('storage/', '', (string) $images[0]->image_path)));
+        $this->assertTrue(Storage::disk('public')->exists(str_replace('storage/', '', (string) $images[1]->image_path)));
 
         $this->assertSame($images[0]->image_path, $product->fresh()->image_path);
     }

@@ -4,6 +4,10 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+@php
+    $barClass = 'h-2 rounded-full bg-blue-500';
+    $progressClass = 'w-full h-2 overflow-hidden rounded-full bg-gray-100';
+@endphp
 <div class="mb-6">
     <h2 class="text-2xl font-bold text-gray-900">Bem-vindo, {{ Auth::user()->name }}!</h2>
     <p class="text-gray-600 mt-1">Resumo operacional em tempo real • {{ now()->format('d/m/Y H:i') }}</p>
@@ -52,7 +56,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     <!-- Compras Pendentes -->
     @if ($metrics['pending_purchases'] > 0)
-        <a href="{{ route('purchase-orders.index') }}" class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200 p-6 hover:shadow-md transition">
+        <a href="{{ route('purchase-orders.index') }}" class="bg-linear-to-br from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200 p-6 hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-yellow-900 text-sm font-semibold">📋 Pedidos de Compra</p>
@@ -103,7 +107,7 @@
                                 $maxQty = $weekly_sales->max('qty');
                                 $widthPercent = $maxQty > 0 ? ($day->qty / $maxQty) * 100 : 0;
                             @endphp
-                            <div class="h-full bg-blue-500" style="width: {{ $widthPercent }}%"></div>
+                            <progress value="{{ $widthPercent }}" max="100" class="{{ $progressClass }}"></progress>
                         </div>
                     </div>
                     <div class="text-right">
@@ -136,7 +140,7 @@
                         <span class="text-xs font-bold text-gray-700 ml-2">{{ number_format((float) $product->qty, 0, ',', '.') }}</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: {{ $width }}%"></div>
+                        <progress value="{{ $width }}" max="100" class="w-full h-2 overflow-hidden rounded-full bg-gray-200"></progress>
                     </div>
                 </div>
             @empty

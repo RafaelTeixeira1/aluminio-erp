@@ -4,6 +4,11 @@
 @section('page-title', $product ? 'Editar Produto' : 'Novo Produto')
 
 @section('content')
+@php
+    $inputClass = function (string $field) use ($errors): string {
+        return 'w-full px-4 py-2 border ' . ($errors->has($field) ? 'border-red-500' : 'border-gray-300') . ' rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500';
+    };
+@endphp
 <div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
     <h1 class="text-2xl font-bold mb-6">{{ $product ? 'Editar Produto' : 'Novo Produto' }}</h1>
 
@@ -19,7 +24,7 @@
             <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Produto</label>
             <input type="text" name="name" value="{{ old('name', $product->name ?? '') }}" required
-                class="w-full px-4 py-2 border @error('name') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="{{ $inputClass('name') }}">
             @error('name')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -28,7 +33,7 @@
             <div class="mt-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
             <select name="category_id" required
-                class="w-full px-4 py-2 border @error('category_id') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="{{ $inputClass('category_id') }}">
                 <option value="">Selecione uma categoria...</option>
                 @foreach($categories as $cat)
                     <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id ?? '') == $cat->id ? 'selected' : '' }}>
@@ -44,7 +49,7 @@
             <div class="mt-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
             <select name="item_type" required
-                class="w-full px-4 py-2 border @error('item_type') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="{{ $inputClass('item_type') }}">
                 <option value="">Selecione um tipo...</option>
                 <option value="produto" {{ old('item_type', $product->item_type ?? '') == 'produto' ? 'selected' : '' }}>Produto</option>
                 <option value="acessorio" {{ old('item_type', $product->item_type ?? '') == 'acessorio' ? 'selected' : '' }}>Acessório</option>
@@ -58,7 +63,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
                     <input type="number" name="price" value="{{ old('price', $product->price ?? '') }}" step="0.01" required
-                        class="w-full px-4 py-2 border @error('price') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="{{ $inputClass('price') }}">
                     @error('price')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -67,7 +72,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Peso linear (kg/m)</label>
                     <input type="number" name="weight_per_meter_kg" value="{{ old('weight_per_meter_kg', $product->weight_per_meter_kg ?? '') }}" step="0.001" min="0"
-                        class="w-full px-4 py-2 border @error('weight_per_meter_kg') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('weight_per_meter_kg') }}"
                         placeholder="Ex: 0,676">
                     <p class="text-xs text-gray-500 mt-1">Use ponto para casas decimais (ex: 0.676).</p>
                     @error('weight_per_meter_kg')
@@ -83,7 +88,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Estoque</label>
                 <input type="number" name="stock" value="{{ old('stock', $product->stock ?? 0) }}" required
-                    class="w-full px-4 py-2 border @error('stock') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="{{ $inputClass('stock') }}">
                 @error('stock')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -92,7 +97,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Estoque Mínimo</label>
                 <input type="number" name="stock_minimum" value="{{ old('stock_minimum', $product->stock_minimum ?? 0) }}" required
-                    class="w-full px-4 py-2 border @error('stock_minimum') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="{{ $inputClass('stock_minimum') }}">
                 @error('stock_minimum')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -108,7 +113,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Material</label>
                     <input type="text" name="material" value="{{ old('material', $product->material ?? '') }}"
-                        class="w-full px-4 py-2 border @error('material') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('material') }}"
                         placeholder="Ex: Aluminio">
                     @error('material')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -117,7 +122,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Acabamento</label>
                     <input type="text" name="finish" value="{{ old('finish', $product->finish ?? '') }}"
-                        class="w-full px-4 py-2 border @error('finish') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('finish') }}"
                         placeholder="Ex: Anodizado fosco">
                     @error('finish')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -129,7 +134,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Espessura (mm)</label>
                     <input type="number" name="thickness_mm" value="{{ old('thickness_mm', $product->thickness_mm ?? '') }}" step="0.001" min="0"
-                        class="w-full px-4 py-2 border @error('thickness_mm') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('thickness_mm') }}"
                         placeholder="Ex: 1,250">
                     @error('thickness_mm')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -138,7 +143,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Largura padrao (mm)</label>
                     <input type="number" name="standard_width_mm" value="{{ old('standard_width_mm', $product->standard_width_mm ?? '') }}" step="0.01" min="0"
-                        class="w-full px-4 py-2 border @error('standard_width_mm') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('standard_width_mm') }}"
                         placeholder="Ex: 6000">
                     @error('standard_width_mm')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -147,7 +152,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Altura padrao (mm)</label>
                     <input type="number" name="standard_height_mm" value="{{ old('standard_height_mm', $product->standard_height_mm ?? '') }}" step="0.01" min="0"
-                        class="w-full px-4 py-2 border @error('standard_height_mm') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('standard_height_mm') }}"
                         placeholder="Ex: 1000">
                     @error('standard_height_mm')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -159,7 +164,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
                     <input type="text" name="brand" value="{{ old('brand', $product->brand ?? '') }}"
-                        class="w-full px-4 py-2 border @error('brand') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('brand') }}"
                         placeholder="Ex: Vitralsul">
                     @error('brand')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -168,7 +173,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Linha</label>
                     <input type="text" name="product_line" value="{{ old('product_line', $product->product_line ?? '') }}"
-                        class="w-full px-4 py-2 border @error('product_line') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="{{ $inputClass('product_line') }}"
                         placeholder="Ex: Gold 32">
                     @error('product_line')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -179,7 +184,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Observacoes tecnicas</label>
                 <textarea name="technical_notes" rows="3"
-                    class="w-full px-4 py-2 border @error('technical_notes') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="{{ $inputClass('technical_notes') }}"
                     placeholder="Ex: Aplicacao, tolerancias, acabamento e detalhes de corte.">{{ old('technical_notes', $product->technical_notes ?? '') }}</textarea>
                 @error('technical_notes')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -190,7 +195,7 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Imagem do Produto</label>
             <input type="file" name="image" accept="image/png,image/jpeg,image/webp"
-                class="w-full px-4 py-2 border @error('image') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="{{ $inputClass('image') }}">
             @error('image')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -223,7 +228,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Enviar multiplas imagens</label>
                     <input type="file" name="gallery_images[]" multiple accept="image/png,image/jpeg,image/webp"
-                        class="w-full px-4 py-2 border @error('gallery_images') border-red-500 @else border-gray-300 @enderror rounded-lg">
+                        class="{{ $inputClass('gallery_images') }}">
                     @error('gallery_images')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror

@@ -4,6 +4,15 @@
 @section('page-title', 'Novo Pedido de Compra')
 
 @section('content')
+@php
+    $inputClass = function (string $field) use ($errors): string {
+        return 'w-full px-4 py-2 border ' . ($errors->has($field) ? 'border-red-500' : 'border-gray-300') . ' rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500';
+    };
+    $catalogItemsData = $catalogItems->map(fn ($item) => [
+        'id' => $item->id,
+        'name' => $item->name,
+    ])->values();
+@endphp
 <div class="max-w-4xl mx-auto">
     <a href="{{ route('purchase-orders.index') }}" class="text-blue-600 hover:text-blue-900 mb-6 inline-flex items-center">
         ← Voltar para Pedidos
@@ -21,7 +30,7 @@
                     Fornecedor <span class="text-red-500">*</span>
                 </label>
                 <select id="supplier_id" name="supplier_id" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('supplier_id') border-red-500 @enderror"
+                        class="{{ $inputClass('supplier_id') }}"
                         required>
                     <option value="">Selecione um fornecedor...</option>
                     @foreach($suppliers as $supplier)
@@ -41,7 +50,7 @@
                     Data de Entrega Prevista
                 </label>
                 <input type="date" id="delivery_date" name="delivery_date" value="{{ old('delivery_date') }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('delivery_date') border-red-500 @enderror">
+                       class="{{ $inputClass('delivery_date') }}">
                 @error('delivery_date')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -74,7 +83,7 @@
                     Notas
                 </label>
                 <textarea id="notes" name="notes" rows="3" 
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('notes') border-red-500 @enderror"
+                          class="{{ $inputClass('notes') }}"
                           placeholder="Observações adicionais...">{{ old('notes') }}</textarea>
                 @error('notes')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -102,8 +111,10 @@
     </div>
 </div>
 
+<script type="application/json" id="catalog-items-data">{!! json_encode($catalogItemsData) !!}</script>
+
 <script>
-const catalogItems = @json($catalogItems);
+const catalogItems = JSON.parse(document.getElementById('catalog-items-data').textContent || '[]');
 let itemIndex = 0;
 
 document.getElementById('addItemBtn').addEventListener('click', function() {

@@ -4,6 +4,9 @@
 @section('page-title', 'Gerenciar Orcamentos')
 
 @section('content')
+@php
+    $selectedClientEmail = '';
+@endphp
 <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Orcamentos</h1>
@@ -116,7 +119,7 @@
                     <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('quotes.edit', $quote) }}" class="text-blue-600 hover:text-blue-900">Editar</a>
                         <a href="{{ route('quotes.printPreview', $quote) }}" target="_blank" class="text-slate-600 hover:text-slate-900">Impressao</a>
-                        <button onclick="openEmailModal({{ $quote->id }}, '{{ $quote->client?->email ?? '' }}')" class="text-amber-600 hover:text-amber-900">Email</button>
+                        <button type="button" data-action="open-email-modal" data-quote-id="{{ $quote->id }}" data-client-email="{{ e($quote->client?->email ?? '') }}" class="text-amber-600 hover:text-amber-900">Email</button>
                         <form action="{{ route('quotes.duplicate', $quote) }}" method="POST" class="inline" onsubmit="return confirm('Deseja duplicar este orçamento?');">
                             @csrf
                             <button type="submit" class="text-indigo-600 hover:text-indigo-900">Duplicar</button>
@@ -148,7 +151,7 @@
 @endif
 
 <!-- Modal para enviar email -->
-<div id="emailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div id="emailModal" class="fixed inset-0 z-50 grid place-items-center bg-black bg-opacity-50" style="display: none;">
     <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Enviar Orçamento por Email</h3>
         
@@ -177,27 +180,30 @@
 </div>
 
 <script>
+const emailModal = document.getElementById('emailModal');
+const emailForm = document.getElementById('emailForm');
+const recipientEmail = document.getElementById('recipient_email');
+
 function openEmailModal(quoteId, clientEmail = '') {
-    const modal = document.getElementById('emailModal');
-    const form = document.getElementById('emailForm');
-    const emailInput = document.getElementById('recipient_email');
-    
-    // Setar o email do cliente como valor padrão
-    emailInput.value = clientEmail;
-    
-    // Atualize a ação do formulário para enviar para o endpoint correto
-    form.action = `/orcamentos/${quoteId}/email`;
-    
-    modal.classList.remove('hidden');
+    recipientEmail.value = clientEmail;
+    emailForm.action = `/orcamentos/${quoteId}/email`;
+    emailModal.style.display = 'grid';
 }
 
 function closeEmailModal() {
-    const modal = document.getElementById('emailModal');
-    modal.classList.add('hidden');
+    emailModal.style.display = 'none';
 }
 
-// Fechar modal ao clicar fora dele
-document.getElementById('emailModal')?.addEventListener('click', function(e) {
+document.querySelectorAll('[data-action="open-email-modal"]').forEach((button) => {
+    button.addEventListener('click', () => {
+        openEmailModal(
+            button.getAttribute('data-quote-id'),
+            button.getAttribute('data-client-email') || ''
+        );
+    });
+});
+
+emailModal?.addEventListener('click', function(e) {
     if (e.target === this) {
         closeEmailModal();
     }

@@ -137,8 +137,11 @@
                                 </td>
                                 <td class="px-4 py-4 text-sm text-center">
                                     @if($purchaseOrder->status !== 'cancelado' && $pending > 0)
-                                        <button type="button" class="text-green-600 hover:text-green-900 font-medium" 
-                                                onclick="openReceiveModal({{ $item->id }}, '{{ $item->catalogItem->name }}', {{ $pending }})">
+                                        <button type="button" class="text-green-600 hover:text-green-900 font-medium"
+                                                data-action="open-receive-modal"
+                                                data-item-id="{{ $item->id }}"
+                                                data-product-name="{{ e($item->catalogItem->name) }}"
+                                                data-max-quantity="{{ $pending }}">
                                             Receber
                                         </button>
                                     @endif
@@ -232,7 +235,7 @@
             @endphp
 
             <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                <div class="bg-blue-600 h-3 rounded-full transition-all" style="width: {{ $progress }}%"></div>
+                <div class="bg-blue-600 h-3 rounded-full transition-all" data-progress-bar data-progress="{{ round($progress) }}"></div>
             </div>
             <p class="text-sm text-gray-600 text-center">
                 {{ number_format($receivedItems, 2, ',', '.') }} / {{ number_format($totalItems, 2, ',', '.') }} unidades ({{ round($progress) }}%)
@@ -269,7 +272,7 @@
 </div>
 
 <!-- Modal para Receber Item -->
-<div id="receiveModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+<div id="receiveModal" class="fixed inset-0 z-50 grid place-items-center bg-black bg-opacity-50" style="display: none;" data-receive-url-base="{{ url('/compras/' . $purchaseOrder->id . '/itens') }}">
     <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Receber Item</h2>
 
@@ -324,6 +327,11 @@
 </div>
 
 <script>
+const receiveModal = document.getElementById('receiveModal');
+const receiveForm = document.getElementById('receiveForm');
+const progressBar = document.querySelector('[data-progress-bar]');
+const receiveUrlBase = receiveModal?.dataset.receiveUrlBase || '';
+
 function openReceiveModal(itemId, productName, maxQuantity) {
     document.getElementById('itemId').value = itemId;
     document.getElementById('productName').textContent = productName;
@@ -332,19 +340,39 @@ function openReceiveModal(itemId, productName, maxQuantity) {
     document.getElementById('quantity_received').value = '';
     document.getElementById('received_at').value = new Date().toISOString().split('T')[0];
     document.getElementById('notes').value = '';
-    document.getElementById('receiveModal').classList.remove('hidden');
+    receiveModal.style.display = 'grid';
 }
 
 function closeReceiveModal() {
-    document.getElementById('receiveModal').classList.add('hidden');
+    receiveModal.style.display = 'none';
 }
 
-document.getElementById('receiveForm').addEventListener('submit', function(e) {
+document.querySelectorAll('[data-action="open-receive-modal"]').forEach((button) => {
+    button.addEventListener('click', () => {
+        openReceiveModal(
+            button.getAttribute('data-item-id'),
+            button.getAttribute('data-product-name') || '',
+            Number(button.getAttribute('data-max-quantity') || 0)
+        );
+    });
+});
+
+document.getElementById('receiveModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeReceiveModal();
+    }
+});
+
+if (progressBar) {
+    progressBar.style.width = `${progressBar.dataset.progress || 0}%`;
+}
+
+receiveForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const itemId = document.getElementById('itemId').value;
     const formData = new FormData(this);
     
-    fetch(`{{ route('purchase-orders.index') }}/../${{{ $purchaseOrder->id }}}/itens/${itemId}/receber`, {
+    fetch(`${receiveUrlBase}/${itemId}/receber`, {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('[name="_token"]').value,

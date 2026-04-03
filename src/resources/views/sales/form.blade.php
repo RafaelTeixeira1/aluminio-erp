@@ -5,6 +5,15 @@
 
 @section('content')
 @php
+    $productsData = $products->map(fn ($product) => [
+        'id' => $product->id,
+        'name' => $product->name,
+        'item_type' => $product->item_type,
+        'price' => (float) $product->price,
+        'stock' => (float) $product->stock,
+        'stock_minimum' => (float) $product->stock_minimum,
+    ])->values();
+
     $initialItems = old('items');
     if (!is_array($initialItems) || $initialItems === []) {
         $initialItems = $sale
@@ -186,17 +195,12 @@
     </div>
 </template>
 
-<script>
-const products = @json($products->map(fn($product) => [
-    'id' => $product->id,
-    'name' => $product->name,
-    'item_type' => $product->item_type,
-    'price' => (float) $product->price,
-    'stock' => (float) $product->stock,
-    'stock_minimum' => (float) $product->stock_minimum,
-])->values());
+<script type="application/json" id="products-data">{!! json_encode($productsData) !!}</script>
+<script type="application/json" id="initial-items-data">{!! json_encode($initialItems) !!}</script>
 
-const initialItems = @json($initialItems);
+<script>
+const products = JSON.parse(document.getElementById('products-data').textContent || '[]');
+const initialItems = JSON.parse(document.getElementById('initial-items-data').textContent || '[]');
 
 const itemsContainer = document.getElementById('itemsContainer');
 const rowTemplate = document.getElementById('itemRowTemplate');

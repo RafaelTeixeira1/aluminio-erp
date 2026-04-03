@@ -126,7 +126,7 @@
     <div class="mt-4">{{ $sales->links() }}</div>
 @endif
 
-<div id="confirmSaleModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+<div id="confirmSaleModal" class="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" style="display: none;">
     <div class="w-full max-w-xl bg-white rounded-xl shadow-xl overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-900">Confirmar Venda</h3>
@@ -214,11 +214,11 @@ function openConfirmModal(button) {
     confirmInstallments.value = '1';
     syncFinancialFields();
 
-    confirmSaleModal.classList.remove('hidden');
+    confirmSaleModal.style.display = 'grid';
 }
 
 function closeConfirmModal() {
-    confirmSaleModal.classList.add('hidden');
+    confirmSaleModal.style.display = 'none';
 }
 
 document.querySelectorAll('[data-action="open-confirm-modal"]').forEach((button) => {
