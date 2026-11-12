@@ -53,6 +53,9 @@ COPY --from=assets /app/public/build ./public/build
 RUN chown -R www-data:www-data storage bootstrap/cache \
   && chmod -R ug+rw storage bootstrap/cache
 
+COPY docker/render-start.sh /usr/local/bin/render-start
+RUN chmod +x /usr/local/bin/render-start
+
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+CMD ["render-start"]

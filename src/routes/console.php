@@ -67,3 +67,18 @@ Artisan::command('ops:preflight', function (OperationsPreflightService $service)
 
     return $result['status'] === 'ok' ? self::SUCCESS : self::FAILURE;
 })->purpose('Executa checklist de prontidao para deploy em producao');
+
+Artisan::command('db:seed-if-empty', function () {
+    if (\App\Models\User::query()->exists()) {
+        $this->info('Banco ja possui usuarios; seed inicial ignorado.');
+
+        return self::SUCCESS;
+    }
+
+    $this->info('Banco vazio: executando ProductionSeeder.');
+
+    return $this->call('db:seed', [
+        '--class' => 'Database\\Seeders\\ProductionSeeder',
+        '--force' => true,
+    ]);
+})->purpose('Popula o banco com os dados iniciais apenas quando ainda nao ha usuarios');
