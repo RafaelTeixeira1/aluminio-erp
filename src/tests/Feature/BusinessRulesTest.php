@@ -9,7 +9,7 @@ use App\Models\Receivable;
 use App\Models\Sale;
 use App\Models\StockMovement;
 use App\Services\QuoteService;
-use App\Services\SaleService;
+use App\Services\SaleFacade;
 use DomainException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -51,9 +51,9 @@ class BusinessRulesTest extends TestCase
             'line_total' => 300,
         ]);
 
-        /** @var SaleService $service */
-        $service = app(SaleService::class);
-        $confirmed = $service->confirmSale($sale, null);
+        /** @var SaleFacade $service */
+        $service = app(SaleFacade::class);
+        $confirmed = $service->confirmarVenda($sale, null);
 
         $this->assertSame('confirmada', $confirmed->status);
         $this->assertNotNull($confirmed->confirmed_at);
@@ -106,13 +106,13 @@ class BusinessRulesTest extends TestCase
             'line_total' => 360,
         ]);
 
-        /** @var SaleService $service */
-        $service = app(SaleService::class);
+        /** @var SaleFacade $service */
+        $service = app(SaleFacade::class);
 
         $this->expectException(DomainException::class);
         $this->expectExceptionMessage('Estoque insuficiente. Operacao cancelada.');
 
-        $service->confirmSale($sale, null);
+        $service->confirmarVenda($sale, null);
     }
 
     public function test_expire_overdue_quotes_updates_only_allowed_statuses(): void

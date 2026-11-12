@@ -16,7 +16,7 @@ class StoreQuoteRequest extends FormRequest
     {
         return [
             'client_id' => ['nullable', 'integer', 'exists:clients,id'],
-            'status' => ['nullable', 'in:aberto,aprovado,convertido,cancelado,expirado'],
+            'status' => ['nullable', 'in:aberto,aprovado,cancelado,expirado'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'valid_until' => ['nullable', 'date'],
             'payment_method' => ['nullable', 'in:boleto,pix,cartao,boleto_pix,pix_cartao,boleto_cartao,misto'],

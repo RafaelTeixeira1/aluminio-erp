@@ -93,6 +93,7 @@ Route::middleware(['api.token', 'throttle:api-auth', 'api.request.log'])->group(
     Route::post('/vendas', [SaleController::class, 'store'])->middleware('profile:admin,vendedor');
     Route::put('/vendas/{venda}/itens', [SaleController::class, 'replaceItems'])->middleware('profile:admin,vendedor');
     Route::post('/vendas/{venda}/confirmar', [SaleController::class, 'confirm'])->middleware('profile:admin,vendedor');
+    Route::post('/vendas/{venda}/cancelar', [SaleController::class, 'cancel'])->middleware('profile:admin');
 
     Route::get('/sequencias', [SequenceController::class, 'index'])->middleware('profile:admin');
     Route::get('/sequencias/{code}', [SequenceController::class, 'show'])->middleware('profile:admin');

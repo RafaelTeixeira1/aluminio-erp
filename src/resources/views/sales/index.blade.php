@@ -39,6 +39,7 @@
                 <option value="">Todos</option>
                 <option value="pendente" {{ ($filters['status'] ?? '') === 'pendente' ? 'selected' : '' }}>Pendente</option>
                 <option value="confirmada" {{ ($filters['status'] ?? '') === 'confirmada' ? 'selected' : '' }}>Confirmada</option>
+                <option value="cancelada" {{ ($filters['status'] ?? '') === 'cancelada' ? 'selected' : '' }}>Cancelada</option>
             </select>
         </div>
         <div>
@@ -90,13 +91,13 @@
                     <td class="px-6 py-4 text-sm text-gray-700">{{ $sale->id }}</td>
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $sale->client->name ?? '-' }}</td>
                     <td class="px-6 py-4 text-sm">
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $sale->status === 'confirmada' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">{{ ucfirst($sale->status) }}</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $sale->status === 'confirmada' ? 'bg-green-100 text-green-800' : ($sale->status === 'cancelada' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">{{ ucfirst($sale->status) }}</span>
                     </td>
                     <td class="px-6 py-4 text-sm text-right text-gray-700">{{ $sale->items->count() }}</td>
                     <td class="px-6 py-4 text-sm font-semibold text-right text-gray-900">R$ {{ number_format((float) $sale->total, 2, ',', '.') }}</td>
                     <td class="px-6 py-4 text-sm text-right table-actions">
                         <a href="{{ route('sales.printPreview', $sale) }}" target="_blank" class="text-slate-600 hover:text-slate-900">Impressao</a>
-                        @if($sale->status !== 'confirmada')
+                        @if($sale->status === 'pendente')
                             <a href="{{ route('sales.edit', $sale) }}" class="text-blue-600 hover:text-blue-900">Editar Itens</a>
                             <button
                                 type="button"
@@ -108,8 +109,16 @@
                             >
                                 Confirmar
                             </button>
+                        @elseif($sale->status === 'cancelada')
+                            <span class="text-gray-500">Cancelada</span>
                         @else
                             <span class="text-gray-500">Concluida</span>
+                        @endif
+                        @if(in_array($sale->status, ['pendente', 'confirmada'], true) && (auth()->user()?->profile ?? '') === 'admin')
+                            <form action="{{ route('sales.cancel', $sale) }}" method="POST" class="inline" onsubmit="return confirm('Cancelar esta venda?{{ $sale->status === 'confirmada' ? ' O estoque sera estornado e as contas a receber serao canceladas.' : '' }}');">
+                                @csrf
+                                <button type="submit" class="text-red-600 hover:text-red-900">Cancelar</button>
+                            </form>
                         @endif
                     </td>
                 </tr>

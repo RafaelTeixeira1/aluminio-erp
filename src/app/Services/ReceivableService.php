@@ -119,6 +119,44 @@ class ReceivableService
     }
 
     /**
+     * Cancela os titulos de uma venda que esta sendo cancelada.
+     * Titulos que ja receberam pagamento impedem o cancelamento.
+     */
+    public function cancelForSale(Sale $sale, ?int $userId): int
+    {
+        $receivables = Receivable::query()
+            ->where('sale_id', $sale->id)
+            ->where('status', '!=', 'cancelado')
+            ->get();
+
+        foreach ($receivables as $receivable) {
+            if ((float) $receivable->amount_paid > 0 || in_array($receivable->status, ['quitado', 'parcial'], true)) {
+                throw new DomainException('Venda com recebimento registrado nao pode ser cancelada. Estorne os recebimentos antes.');
+            }
+        }
+
+        foreach ($receivables as $receivable) {
+            $receivable->update([
+                'status' => 'cancelado',
+                'balance' => 0,
+            ]);
+
+            $this->auditLogService->record(
+                action: 'receivable.cancelled_by_sale',
+                userId: $userId,
+                entityType: Receivable::class,
+                entityId: $receivable->id,
+                payload: [
+                    'sale_id' => $sale->id,
+                    'amount_total' => (float) $receivable->amount_total,
+                ],
+            );
+        }
+
+        return $receivables->count();
+    }
+
+    /**
      * @return Collection<int, Receivable>
      */
     public function splitIntoInstallments(

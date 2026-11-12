@@ -4,12 +4,14 @@ namespace App\Services;
 
 use App\Models\CatalogItem;
 use App\Models\Quote;
+use App\Services\QuoteItems\QuoteItemCreatorResolver;
 use Illuminate\Support\Facades\DB;
 
 class QuoteService
 {
     public function __construct(
-        private readonly SequenceService $sequenceService
+        private readonly SequenceService $sequenceService,
+        private readonly QuoteItemCreatorResolver $creatorResolver,
     ) {
     }
 
@@ -54,11 +56,17 @@ class QuoteService
     }
 
     /**
+     * Substitui os itens do orcamento. Cada item e montado pelo criador
+     * correspondente a unidade de venda do produto (Factory Method), e a
+     * alteracao so acontece se a situacao atual do orcamento permitir (State).
+     *
      * @param array<int, array<string, mixed>> $items
      */
     public function replaceItems(Quote $quote, array $items): Quote
     {
         return DB::transaction(function () use ($quote, $items) {
+            $quote->state()->assertCanEdit($quote);
+
             $quote->items()->delete();
 
             foreach ($items as $payload) {
@@ -67,32 +75,88 @@ class QuoteService
                     $catalogItem = CatalogItem::query()->findOrFail($payload['catalog_item_id']);
                 }
 
-                $quantity = (float) ($payload['quantity'] ?? 0);
-                $unitPrice = $catalogItem !== null
-                    ? (float) $catalogItem->price
-                    : (float) ($payload['unit_price'] ?? 0);
-                $itemName = $catalogItem !== null
-                    ? (string) $catalogItem->name
-                    : (string) ($payload['item_name'] ?? '');
-                $itemType = $catalogItem !== null
-                    ? (string) $catalogItem->item_type
-                    : (string) ($payload['item_type'] ?? 'produto');
+                $item = $this->creatorResolver
+                    ->forProduct($catalogItem)
+                    ->montarItem($catalogItem, $payload);
 
-                $quote->items()->create([
-                    'catalog_item_id' => $catalogItem?->id,
-                    'item_name' => $itemName,
-                    'item_type' => $itemType,
-                    'quantity' => $quantity,
-                    'unit_price' => $unitPrice,
-                    'width_mm' => $payload['width_mm'] ?? null,
-                    'height_mm' => $payload['height_mm'] ?? null,
-                    'line_total' => $quantity * $unitPrice,
-                    'metadata' => $payload['metadata'] ?? null,
-                ]);
+                $quote->items()->save($item);
             }
 
             return $this->recalculate($quote->fresh());
         });
+    }
+
+    /**
+     * Cria um orcamento aberto e o leva a situacao pedida, se houver.
+     *
+     * @param array<string, mixed> $attributes
+     * @param array<int, array<string, mixed>>|null $items
+     */
+    public function createWithItems(array $attributes, ?array $items, ?int $userId): Quote
+    {
+        return DB::transaction(function () use ($attributes, $items, $userId): Quote {
+            $targetStatus = $attributes['status'] ?? null;
+            unset($attributes['status']);
+
+            $quote = Quote::query()->create([
+                ...$attributes,
+                'status' => 'aberto',
+                'discount' => $attributes['discount'] ?? 0,
+                'created_by_user_id' => $userId,
+            ]);
+
+            $quote = $items !== null && $items !== []
+                ? $this->replaceItems($quote, $items)
+                : $this->recalculate($quote);
+
+            if (is_string($targetStatus) && $targetStatus !== '') {
+                $quote->transitionTo($targetStatus);
+            }
+
+            return $quote->fresh(['items', 'designSketches', 'pieceDesigns', 'client']);
+        });
+    }
+
+    /**
+     * Atualiza dados e itens do orcamento e, por ultimo, aplica a mudanca de situacao.
+     * Orcamentos convertidos, cancelados ou expirados nao aceitam alteracoes.
+     *
+     * @param array<string, mixed> $attributes
+     * @param array<int, array<string, mixed>>|null $items
+     */
+    public function update(Quote $quote, array $attributes, ?array $items = null): Quote
+    {
+        return DB::transaction(function () use ($quote, $attributes, $items): Quote {
+            $quote->state()->assertCanEdit($quote);
+
+            $targetStatus = $attributes['status'] ?? null;
+            unset($attributes['status']);
+
+            $quote->update($attributes);
+
+            $quote = $items !== null && $items !== []
+                ? $this->replaceItems($quote, $items)
+                : $this->recalculate($quote->fresh());
+
+            if (is_string($targetStatus) && $targetStatus !== '') {
+                $quote->transitionTo($targetStatus);
+            }
+
+            return $quote->fresh(['items', 'designSketches', 'pieceDesigns', 'client']);
+        });
+    }
+
+    /**
+     * Valida se o orcamento pode ser convertido e o marca como convertido (usado pela SaleFacade).
+     */
+    public function assertCanConvert(Quote $quote): void
+    {
+        $quote->state()->assertCanConvert($quote);
+    }
+
+    public function markAsConverted(Quote $quote): void
+    {
+        $quote->state()->convert($quote);
     }
 
     public function recalculate(Quote $quote): Quote

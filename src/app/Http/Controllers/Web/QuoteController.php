@@ -11,7 +11,7 @@ use App\Models\DesignSketch;
 use App\Models\Quote;
 use App\Services\QuoteDocumentSettingsService;
 use App\Services\QuoteService;
-use App\Services\SaleService;
+use App\Services\SaleFacade;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,7 +27,7 @@ class QuoteController extends Controller
 {
     public function __construct(
         private readonly QuoteService $quoteService,
-        private readonly SaleService $saleService,
+        private readonly SaleFacade $saleFacade,
         private readonly QuoteDocumentSettingsService $quoteDocumentSettingsService,
     ) {
     }
@@ -111,18 +111,10 @@ class QuoteController extends Controller
     {
         $data = $request->validated();
 
-        $quote = Quote::query()->create([
-            ...$data,
-            'status' => $data['status'] ?? 'aberto',
-            'discount' => $data['discount'] ?? 0,
-            'created_by_user_id' => $request->user()?->id,
-        ]);
-
-        $items = $this->normalizedItems($request);
-        if ($items !== []) {
-            $this->quoteService->replaceItems($quote, $items);
-        } else {
-            $this->quoteService->recalculate($quote);
+        try {
+            $quote = $this->quoteService->createWithItems($data, $this->normalizedItems($request), $request->user()?->id);
+        } catch (DomainException $exception) {
+            return back()->withErrors(['quote' => $exception->getMessage()])->withInput();
         }
 
         $this->syncInlineSketch($request, $quote);
@@ -147,13 +139,10 @@ class QuoteController extends Controller
 
     public function update(StoreQuoteRequest $request, Quote $quote): RedirectResponse
     {
-        $quote->update($request->validated());
-
-        $items = $this->normalizedItems($request);
-        if ($items !== []) {
-            $this->quoteService->replaceItems($quote, $items);
-        } else {
-            $this->quoteService->recalculate($quote);
+        try {
+            $quote = $this->quoteService->update($quote, $request->validated(), $this->normalizedItems($request));
+        } catch (DomainException $exception) {
+            return back()->withErrors(['quote' => $exception->getMessage()])->withInput();
         }
 
         $this->syncInlineSketch($request, $quote);
@@ -171,7 +160,7 @@ class QuoteController extends Controller
     public function convert(Request $request, Quote $quote): RedirectResponse
     {
         try {
-            $this->saleService->createFromQuote($quote, $request->user()?->id);
+            $this->saleFacade->converterOrcamentoEmVenda($quote, $request->user()?->id);
         } catch (DomainException $exception) {
             return back()->withErrors(['quote' => $exception->getMessage()]);
         }

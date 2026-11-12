@@ -22,6 +22,8 @@ class Sale extends Model
         'discount',
         'total',
         'confirmed_at',
+        'cancelled_at',
+        'cancellation_reason',
     ];
 
     protected function casts(): array
@@ -31,6 +33,7 @@ class Sale extends Model
             'discount' => 'decimal:2',
             'total' => 'decimal:2',
             'confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 

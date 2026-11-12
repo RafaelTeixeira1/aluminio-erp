@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Services\QuoteService;
-use App\Services\SaleService;
+use App\Services\SaleFacade;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ class QuoteController extends Controller
 {
     public function __construct(
         private readonly QuoteService $quoteService,
-        private readonly SaleService $saleService,
+        private readonly SaleFacade $saleFacade,
     ) {
     }
 
@@ -46,17 +46,17 @@ class QuoteController extends Controller
         $canViewFinancial = (string) ($request->user()?->profile ?? '') !== 'vendedor';
         $data = $request->validate([
             'client_id' => ['required', 'integer', 'exists:clients,id'],
-            'status' => ['nullable', 'in:aberto,aprovado,convertido,cancelado,expirado'],
+            'status' => ['nullable', 'in:aberto,aprovado,cancelado,expirado'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'valid_until' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        $quote = Quote::query()->create([
-            ...$data,
-            'status' => $data['status'] ?? 'aberto',
-            'created_by_user_id' => $request->user()?->id,
-        ]);
+        try {
+            $quote = $this->quoteService->createWithItems($data, null, $request->user()?->id);
+        } catch (DomainException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        }
 
         $payload = $quote->load('client')->toArray();
         if (!$canViewFinancial) {
@@ -87,14 +87,17 @@ class QuoteController extends Controller
         $canViewFinancial = (string) ($request->user()?->profile ?? '') !== 'vendedor';
         $data = $request->validate([
             'client_id' => ['sometimes', 'required', 'integer', 'exists:clients,id'],
-            'status' => ['sometimes', 'required', 'in:aberto,aprovado,convertido,cancelado,expirado'],
+            'status' => ['sometimes', 'required', 'in:aberto,aprovado,cancelado,expirado'],
             'discount' => ['sometimes', 'required', 'numeric', 'min:0'],
             'valid_until' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        $orcamento->update($data);
-        $orcamento = $this->quoteService->recalculate($orcamento->fresh());
+        try {
+            $orcamento = $this->quoteService->update($orcamento, $data);
+        } catch (DomainException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        }
 
         $payload = $orcamento->toArray();
         if (!$canViewFinancial) {
@@ -128,7 +131,11 @@ class QuoteController extends Controller
             'items.*.metadata' => ['nullable', 'array'],
         ]);
 
-        $quote = $this->quoteService->replaceItems($orcamento, $data['items']);
+        try {
+            $quote = $this->quoteService->replaceItems($orcamento, $data['items']);
+        } catch (DomainException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        }
 
         $payload = $quote->toArray();
         if (!$canViewFinancial) {
@@ -191,7 +198,7 @@ class QuoteController extends Controller
     {
         $canViewFinancial = (string) ($request->user()?->profile ?? '') !== 'vendedor';
         try {
-            $sale = $this->saleService->createFromQuote($orcamento, $request->user()?->id);
+            $sale = $this->saleFacade->converterOrcamentoEmVenda($orcamento, $request->user()?->id);
         } catch (DomainException $exception) {
             return response()->json(['message' => $exception->getMessage()], 422);
         }
