@@ -238,16 +238,24 @@ class DesignPatternsTest extends TestCase
         $facade->confirmarVenda($sale->fresh(), null);
     }
 
-    public function test_only_admin_can_cancel_sale_through_api(): void
+    public function test_vendedor_cannot_cancel_sale_through_api(): void
     {
         [$sale] = $this->pendingSale(quantity: 1, stock: 10);
 
         $this->postJson('/api/vendas/'.$sale->id.'/cancelar', [], $this->authHeader($this->user('vendedor')))
             ->assertForbidden();
 
+        $this->assertSame('pendente', $sale->fresh()->status);
+    }
+
+    public function test_admin_can_cancel_sale_through_api(): void
+    {
+        [$sale] = $this->pendingSale(quantity: 1, stock: 10);
+
         $this->postJson('/api/vendas/'.$sale->id.'/cancelar', ['reason' => 'Erro de digitacao'], $this->authHeader($this->user('admin')))
             ->assertOk()
-            ->assertJsonPath('status', 'cancelada');
+            ->assertJsonPath('status', 'cancelada')
+            ->assertJsonPath('cancellation_reason', 'Erro de digitacao');
     }
 
     // ---------------------------------------------------------------- Helpers
