@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/vendas/{sale}/pdf', [SaleController::class, 'printPdf'])->name('sales.printPdf');
         Route::put('/vendas/{sale}/itens', [SaleController::class, 'updateItems'])->name('sales.updateItems');
         Route::post('/vendas/{sale}/confirmar', [SaleController::class, 'confirm'])->name('sales.confirm');
+        Route::post('/vendas/{sale}/cancelar', [SaleController::class, 'cancel'])->middleware('profile:admin')->name('sales.cancel');
 
         Route::get('/orcamentos', [QuoteController::class, 'index'])->name('quotes.index');
         Route::get('/orcamentos/exportar.csv', [QuoteController::class, 'exportCsv'])->name('quotes.exportCsv');

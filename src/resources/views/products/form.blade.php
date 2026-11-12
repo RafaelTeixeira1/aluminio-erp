@@ -59,6 +59,19 @@
             @enderror
             </div>
 
+            <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Unidade de venda</label>
+            <select name="sale_unit" class="{{ $inputClass('sale_unit') }}">
+                @foreach(\App\Models\CatalogItem::SALE_UNIT_LABELS as $unitValue => $unitLabel)
+                    <option value="{{ $unitValue }}" {{ old('sale_unit', $product->sale_unit ?? 'unidade') === $unitValue ? 'selected' : '' }}>{{ $unitLabel }}</option>
+                @endforeach
+            </select>
+            <p class="text-gray-500 text-xs mt-1">O preço é o valor de uma unidade de venda: por unidade, por pacote, por barra de 6 m ou por m².</p>
+            @error('sale_unit')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+            </div>
+
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>

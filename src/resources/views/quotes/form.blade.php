@@ -291,6 +291,7 @@
                                             value="{{ $product->id }}"
                                             data-name="{{ $product->name }}"
                                             data-type="{{ $product->item_type }}"
+                                            data-sale-unit="{{ $product->sale_unit ?? 'unidade' }}"
                                             data-price="{{ $product->price }}"
                                             data-image="{{ $product->image_path ?? '' }}"
                                             data-kgm="{{ $product->effective_weight_per_meter_kg ?? '' }}"
@@ -325,11 +326,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Largura (mm)</label>
-                                <input type="number" step="0.01" name="items[{{ $i }}][width_mm]" value="{{ old("items.$i.width_mm", $item->width_mm ?? '') }}" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded">
+                                <input type="number" step="0.01" name="items[{{ $i }}][width_mm]" value="{{ old("items.$i.width_mm", $item->width_mm ?? '') }}" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded js-width-mm">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Altura (mm)</label>
-                                <input type="number" step="0.01" name="items[{{ $i }}][height_mm]" value="{{ old("items.$i.height_mm", $item->height_mm ?? '') }}" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded">
+                                <input type="number" step="0.01" name="items[{{ $i }}][height_mm]" value="{{ old("items.$i.height_mm", $item->height_mm ?? '') }}" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded js-height-mm">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Imagem do item (opcional)</label>
@@ -1046,6 +1047,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 value="{{ $product->id }}"
                                 data-name="{{ $product->name }}"
                                 data-type="{{ $product->item_type }}"
+                                            data-sale-unit="{{ $product->sale_unit ?? 'unidade' }}"
                                 data-price="{{ $product->price }}"
                                 data-image="{{ $product->image_path ?? '' }}"
                                 data-kgm="{{ $product->effective_weight_per_meter_kg ?? '' }}"
@@ -1079,11 +1081,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Largura (mm)</label>
-                    <input type="number" step="0.01" name="items[${index}][width_mm]" value="" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded">
+                    <input type="number" step="0.01" name="items[${index}][width_mm]" value="" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded js-width-mm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Altura (mm)</label>
-                    <input type="number" step="0.01" name="items[${index}][height_mm]" value="" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded">
+                    <input type="number" step="0.01" name="items[${index}][height_mm]" value="" placeholder="0,00" class="w-full px-2 py-2 border border-gray-300 rounded js-height-mm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Imagem do item (opcional)</label>
@@ -1146,6 +1148,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const kgmInput = row.querySelector('.js-item-kgm');
         const quantityInput = row.querySelector('.js-quantity');
         const lineTotalInput = row.querySelector('.js-line-total');
+        const widthMmInput = row.querySelector('.js-width-mm');
+        const heightMmInput = row.querySelector('.js-height-mm');
         const existingImageInput = row.querySelector('.js-existing-image');
         const removeImageInput = row.querySelector('.js-remove-image');
         const imageLink = row.querySelector('.js-image-link');
@@ -1333,7 +1337,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            lineTotalInput.value = (quantity * price).toFixed(2);
+            // Mesma regra do servidor (Factory Method): vidro por m2, perfil por barra, demais por unidade ou pacote.
+            const selectedOption = select.options[select.selectedIndex];
+            const saleUnit = selectedOption ? (selectedOption.getAttribute('data-sale-unit') || 'unidade') : 'unidade';
+            let lineTotal = quantity * price;
+            if (saleUnit === 'm2') {
+                const widthMm = Number.parseFloat(widthMmInput?.value || '0');
+                const heightMm = Number.parseFloat(heightMmInput?.value || '0');
+                const areaM2 = Number.isFinite(widthMm) && Number.isFinite(heightMm) ? (widthMm * heightMm) / 1000000 : 0;
+                lineTotal = quantity * areaM2 * price;
+            } else if (saleUnit === 'barra') {
+                lineTotal = Math.round(quantity) * price;
+            }
+
+            lineTotalInput.value = lineTotal.toFixed(2);
             recalculateQuoteTotals();
             updateRowStatusBadge();
             updateSubmitState();
@@ -1383,6 +1400,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         select.addEventListener('change', applyProduct);
+        select.addEventListener('change', calculateLineTotal);
+        widthMmInput?.addEventListener('input', calculateLineTotal);
+        heightMmInput?.addEventListener('input', calculateLineTotal);
         applyProduct();
         updateImageElements();
         calculateTotalWeight();

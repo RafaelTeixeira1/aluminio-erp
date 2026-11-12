@@ -19,10 +19,28 @@ class CatalogItem extends Model
         'effective_weight_per_meter_kg',
     ];
 
+    /**
+     * Unidades de venda aceitas. O preco (price) e sempre o valor de uma unidade de venda:
+     * uma unidade, um pacote, uma barra de 6 metros ou um metro quadrado.
+     */
+    public const SALE_UNITS = ['unidade', 'pacote', 'barra', 'm2'];
+
+    public const SALE_UNIT_LABELS = [
+        'unidade' => 'Unidade',
+        'pacote' => 'Pacote',
+        'barra' => 'Barra de 6 m (perfil)',
+        'm2' => 'Metro quadrado (vidro)',
+    ];
+
+    protected $attributes = [
+        'sale_unit' => 'unidade',
+    ];
+
     protected $fillable = [
         'name',
         'category_id',
         'item_type',
+        'sale_unit',
         'price',
         'stock',
         'stock_minimum',
@@ -100,6 +118,11 @@ class CatalogItem extends Model
         }
 
         return $query->where('item_type', $itemType);
+    }
+
+    public function setSaleUnitAttribute(?string $value): void
+    {
+        $this->attributes['sale_unit'] = in_array($value, self::SALE_UNITS, true) ? $value : 'unidade';
     }
 
     public function getStockStatusAttribute(): string

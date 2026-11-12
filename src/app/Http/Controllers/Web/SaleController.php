@@ -8,6 +8,7 @@ use App\Http\Requests\StoreSaleRequest;
 use App\Models\CatalogItem;
 use App\Models\Client;
 use App\Models\Sale;
+use App\Services\SaleFacade;
 use App\Services\SaleService;
 use DomainException;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -20,7 +21,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SaleController extends Controller
 {
-    public function __construct(private readonly SaleService $saleService)
+    public function __construct(
+        private readonly SaleService $saleService,
+        private readonly SaleFacade $saleFacade,
+    )
     {
     }
 
@@ -153,7 +157,7 @@ class SaleController extends Controller
         }
 
         try {
-            $this->saleService->confirmSale($sale, $request->user()?->id, [
+            $this->saleFacade->confirmarVenda($sale, $request->user()?->id, [
                 'installments' => $installments,
                 'first_due_date' => $data['first_due_date'] ?? null,
                 'interval_days' => (int) ($data['interval_days'] ?? 30),
@@ -163,6 +167,21 @@ class SaleController extends Controller
         }
 
         return redirect()->route('sales.index')->with('success', 'Venda confirmada com sucesso!');
+    }
+
+    public function cancel(Request $request, Sale $sale): RedirectResponse
+    {
+        $data = $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            $this->saleFacade->cancelarVenda($sale, $request->user()?->id, $data['reason'] ?? null);
+        } catch (DomainException $e) {
+            return back()->withErrors(['sale' => $e->getMessage()]);
+        }
+
+        return redirect()->route('sales.index')->with('success', 'Venda cancelada com sucesso!');
     }
 
     public function printPreview(Sale $sale): View
@@ -286,7 +305,7 @@ class SaleController extends Controller
                     $clientQuery->where('name', 'like', "%{$search}%");
                 });
             })
-            ->when(in_array($status, ['pendente', 'confirmada'], true), fn ($query) => $query->where('status', $status))
+            ->when(in_array($status, ['pendente', 'confirmada', 'cancelada'], true), fn ($query) => $query->where('status', $status))
             ->when(is_numeric($minTotal), fn ($query) => $query->where('total', '>=', (float) $minTotal))
             ->when(is_numeric($maxTotal), fn ($query) => $query->where('total', '<=', (float) $maxTotal))
             ->orderBy($sortBy, $sortDir)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sale;
+use App\Services\SaleFacade;
 use App\Services\SaleService;
 use DomainException;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,10 @@ use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
-    public function __construct(private readonly SaleService $saleService)
+    public function __construct(
+        private readonly SaleService $saleService,
+        private readonly SaleFacade $saleFacade,
+    )
     {
     }
 
@@ -109,7 +113,30 @@ class SaleController extends Controller
     {
         $canViewFinancial = (string) ($request->user()?->profile ?? '') !== 'vendedor';
         try {
-            $sale = $this->saleService->confirmSale($venda, $request->user()?->id);
+            $sale = $this->saleFacade->confirmarVenda($venda, $request->user()?->id);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        $payload = $sale->toArray();
+        if (!$canViewFinancial) {
+            $payload = $this->maskFinancialFromSalePayload($payload);
+        }
+
+        $payload['can_view_financial'] = $canViewFinancial;
+
+        return response()->json($payload);
+    }
+
+    public function cancel(Request $request, Sale $venda): JsonResponse
+    {
+        $canViewFinancial = (string) ($request->user()?->profile ?? '') !== 'vendedor';
+        $data = $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            $sale = $this->saleFacade->cancelarVenda($venda, $request->user()?->id, $data['reason'] ?? null);
         } catch (DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }

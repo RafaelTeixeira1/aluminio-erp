@@ -37,6 +37,15 @@ class StockService
         return $this->applyDelta($item, -abs($quantity), 'saida', $userId, 'Baixa por venda', 'venda', $saleId);
     }
 
+    public function reversalForCancelledSale(
+        CatalogItem $item,
+        float $quantity,
+        ?int $userId,
+        int $saleId,
+    ): StockMovement {
+        return $this->applyDelta($item, abs($quantity), 'entrada', $userId, 'Estorno por cancelamento de venda', 'venda_cancelada', $saleId);
+    }
+
     public function adjust(
         CatalogItem $item,
         float $newStock,

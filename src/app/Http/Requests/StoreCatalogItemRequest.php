@@ -19,6 +19,7 @@ class StoreCatalogItemRequest extends FormRequest
             'name' => ['required', 'string', 'max:255', "unique:catalog_items,name,$id"],
             'category_id' => ['required', 'exists:categories,id'],
             'item_type' => ['required', 'in:produto,acessorio'],
+            'sale_unit' => ['nullable', 'in:unidade,pacote,barra,m2'],
             'price' => ['required', 'numeric', 'min:0.01'],
             'stock' => ['required', 'numeric', 'min:0'],
             'stock_minimum' => ['required', 'numeric', 'min:0'],
